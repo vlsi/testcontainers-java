@@ -32,7 +32,18 @@ public abstract class ImageNameSubstitutor {
         return instance;
     }
 
-    public abstract DockerImageName substitute(DockerImageName original);
+    public DockerImageName substitute(DockerImageName original) {
+        final DockerImageName replacementImage = this.performSubstitution(original);
+        if (! replacementImage.equals(original)) {
+            log.info("Using {} as a substitute image for {} (using image substitutor: {})", replacementImage.asCanonicalNameString(), original.asCanonicalNameString(), this.getClass().getName());
+            return replacementImage;
+        } else {
+            log.debug("Did not find a substitute image for {} (using image substitutor: {})", original.asCanonicalNameString(), this.getClass().getName());
+            return original;
+        }
+    }
+
+    protected abstract DockerImageName performSubstitution(DockerImageName original);
 
     /**
      * Priority of this {@link ImageNameSubstitutor} compared to other instances that may be found by the service

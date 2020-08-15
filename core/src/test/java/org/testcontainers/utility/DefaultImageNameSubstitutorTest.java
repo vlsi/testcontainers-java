@@ -23,9 +23,9 @@ public class DefaultImageNameSubstitutorTest {
     public void testLocalstackLookup() {
         when(mockConfiguration.getLocalStackImage()).thenReturn("localstack-substitute");
 
-        final DockerImageName substitute = underTest.substitute(DockerImageName.parse("localstack/localstack"));
+        final DockerImageName substitute = underTest.performSubstitution(DockerImageName.parse("localstack/localstack"));
 
         assertEquals("match is found", DockerImageName.parse("localstack-substitute"), substitute);
-        assertTrue("compatibility is automatically set", substitute.isCompatibleWith(TestcontainersConfiguration.DEFAULT_LOCALSTACK));
+        assertTrue("compatibility is automatically set", substitute.isCompatibleWith(DockerImageName.parse(TestcontainersConfiguration.DEFAULT_LOCALSTACK)));
     }
 }

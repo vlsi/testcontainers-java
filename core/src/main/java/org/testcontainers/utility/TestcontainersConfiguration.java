@@ -1,6 +1,7 @@
 package org.testcontainers.utility;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -19,9 +20,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -32,12 +35,22 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class TestcontainersConfiguration {
 
+    public static final String DEFAULT_AMBASSADOR = "richnorth/ambassador:latest";
+    public static final String DEFAULT_SOCAT = "alpine/socat:latest";
+    public static final String DEFAULT_VNC = "testcontainers/vnc-recorder:1.1.0";
+    public static final String DEFAULT_COMPOSE = "docker/compose:1.24.1";
+    public static final String DEFAULT_TINY_IMAGE = "alpine:3.5";
+    public static final String DEFAULT_RYUK = "testcontainers/ryuk:0.3.0";
+    public static final String DEFAULT_SSHD = "testcontainers/sshd:1.0.0";
+    public static final String DEFAULT_KAFKA = "confluentinc/cp-kafka";
+    public static final String DEFAULT_PULSAR = "apachepulsar/pulsar";
+    public static final String DEFAULT_LOCALSTACK = "localstack/localstack";
     private static String PROPERTIES_FILE_NAME = "testcontainers.properties";
 
     private static File ENVIRONMENT_CONFIG_FILE = new File(System.getProperty("user.home"), "." + PROPERTIES_FILE_NAME);
 
     @Getter(lazy = true)
-    private static final TestcontainersConfiguration instance = loadConfiguration();;
+    private static final TestcontainersConfiguration instance = loadConfiguration();
 
     @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})
     @VisibleForTesting
@@ -71,7 +84,7 @@ public class TestcontainersConfiguration {
 
     @Deprecated
     public DockerImageName getAmbassadorContainerDockerImageName() {
-        return getImage("ambassador.container.image", "richnorth/ambassador:latest");
+        return getImage("ambassador.container.image", DEFAULT_AMBASSADOR);
     }
 
     @Deprecated
@@ -80,7 +93,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getSocatDockerImageName() {
-        return getImage("socat.container.image", "alpine/socat:latest");
+        return getImage("socat.container.image", DEFAULT_SOCAT);
     }
 
     @Deprecated
@@ -89,7 +102,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getVncDockerImageName() {
-        return getImage("vncrecorder.container.image", "testcontainers/vnc-recorder:1.1.0");
+        return getImage("vncrecorder.container.image", DEFAULT_VNC);
     }
 
     @Deprecated
@@ -98,7 +111,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getDockerComposeDockerImageName() {
-        return getImage("compose.container.image", "docker/compose:1.24.1");
+        return getImage("compose.container.image", DEFAULT_COMPOSE);
     }
 
     @Deprecated
@@ -107,7 +120,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getTinyDockerImageName() {
-        return getImage("tinyimage.container.image", "alpine:3.5");
+        return getImage("tinyimage.container.image", DEFAULT_TINY_IMAGE);
     }
 
     public boolean isRyukPrivileged() {
@@ -120,7 +133,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getRyukDockerImageName() {
-        return getImage("ryuk.container.image", "testcontainers/ryuk:0.3.0");
+        return getImage("ryuk.container.image", DEFAULT_RYUK);
     }
 
     @Deprecated
@@ -129,7 +142,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getSSHdDockerImageName() {
-        return getImage("sshd.container.image", "testcontainers/sshd:1.0.0");
+        return getImage("sshd.container.image", DEFAULT_SSHD);
     }
 
     public Integer getRyukTimeout() {
@@ -142,7 +155,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getKafkaDockerImageName() {
-        return getImage("kafka.container.image", "confluentinc/cp-kafka");
+        return getImage("kafka.container.image", DEFAULT_KAFKA);
     }
 
     @Deprecated
@@ -151,7 +164,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getPulsarDockerImageName() {
-        return getImage("pulsar.container.image", "apachepulsar/pulsar");
+        return getImage("pulsar.container.image", DEFAULT_PULSAR);
     }
 
     @Deprecated
@@ -160,7 +173,7 @@ public class TestcontainersConfiguration {
     }
 
     public DockerImageName getLocalstackDockerImageName() {
-        return getImage("localstack.container.image", "localstack/localstack");
+        return getImage("localstack.container.image", DEFAULT_LOCALSTACK);
     }
 
     public boolean isDisableChecks() {
@@ -237,5 +250,20 @@ public class TestcontainersConfiguration {
             log.warn("Testcontainers config override was found on {} but could not be loaded", url, e);
         }
         return properties;
+    }
+
+    Map<DockerImageName, Supplier<DockerImageName>> getContainerMapping() {
+        return ImmutableMap.<DockerImageName, Supplier<DockerImageName>>builder()
+            .put(DockerImageName.parse(DEFAULT_AMBASSADOR), this::getAmbassadorContainerDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_SOCAT), this::getSocatDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_VNC), this::getVncDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_COMPOSE), this::getDockerComposeDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_TINY_IMAGE), this::getTinyDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_RYUK), this::getRyukDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_KAFKA), this::getKafkaDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_PULSAR), this::getPulsarDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_LOCALSTACK), this::getLocalstackDockerImageName)
+            .put(DockerImageName.parse(DEFAULT_SSHD), this::getSSHdDockerImageName)
+            .build();
     }
 }

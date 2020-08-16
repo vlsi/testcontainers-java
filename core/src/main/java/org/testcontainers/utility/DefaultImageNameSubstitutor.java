@@ -23,9 +23,7 @@ public class DefaultImageNameSubstitutor extends ImageNameSubstitutor {
     @Override
     public DockerImageName performSubstitution(final DockerImageName original) {
         return configuration
-            .getContainerMapping()
-            .getOrDefault(original, () -> original)
-            .get()
+            .getConfiguredSubstituteImage(original)
             .asCompatibleSubstituteFor(original);
     }
 

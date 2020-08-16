@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
-@EqualsAndHashCode(exclude = "rawName")
+@EqualsAndHashCode(exclude = { "rawName", "compatibleSubstituteFor" })
 public final class DockerImageName {
 
     /* Regex patterns used for validation */

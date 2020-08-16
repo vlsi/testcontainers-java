@@ -2,7 +2,6 @@ package org.testcontainers.containers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
@@ -241,7 +240,7 @@ public class GenericContainer<SELF extends GenericContainer<SELF>>
      */
     @Deprecated
     public GenericContainer() {
-        this(TestcontainersConfiguration.getInstance().getTinyImage());
+        this(DockerImageName.parse("alpine:3.5"));
     }
 
     /**

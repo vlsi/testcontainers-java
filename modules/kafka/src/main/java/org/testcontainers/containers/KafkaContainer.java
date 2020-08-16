@@ -5,7 +5,6 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import lombok.SneakyThrows;
 import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +37,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
      */
     @Deprecated
     public KafkaContainer() {
-        this(TestcontainersConfiguration.getInstance().getKafkaDockerImageName().withTag(DEFAULT_TAG));
+        this(DEFAULT_IMAGE_NAME.withTag(DEFAULT_TAG));
     }
 
     /**
@@ -46,7 +45,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
      */
     @Deprecated
     public KafkaContainer(String confluentPlatformVersion) {
-        this(TestcontainersConfiguration.getInstance().getKafkaDockerImageName().withTag(confluentPlatformVersion));
+        this(DEFAULT_IMAGE_NAME.withTag(confluentPlatformVersion));
     }
 
     public KafkaContainer(final DockerImageName dockerImageName) {

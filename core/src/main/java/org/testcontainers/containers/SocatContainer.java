@@ -17,7 +17,7 @@ public class SocatContainer extends GenericContainer<SocatContainer> {
     private final Map<Integer, String> targets = new HashMap<>();
 
     public SocatContainer() {
-        this(TestcontainersConfiguration.getInstance().getSocatDockerImageName());
+        this(DockerImageName.parse("alpine/socat:latest"));
     }
 
     public SocatContainer(final DockerImageName dockerImageName) {

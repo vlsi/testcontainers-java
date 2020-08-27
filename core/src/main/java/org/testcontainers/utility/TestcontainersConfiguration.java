@@ -82,48 +82,32 @@ public class TestcontainersConfiguration {
 
     @Deprecated
     public String getAmbassadorContainerImage() {
-        return getAmbassadorContainerDockerImageName().asCanonicalNameString();
-    }
-
-    @Deprecated
-    public DockerImageName getAmbassadorContainerDockerImageName() {
-        return getImage("ambassador.container.image", "richnorth/ambassador:latest");
+        return getImage("ambassador.container.image", "richnorth/ambassador:latest")
+            .asCanonicalNameString();
     }
 
     @Deprecated
     public String getSocatContainerImage() {
-        return getSocatDockerImageName().asCanonicalNameString();
-    }
-
-    public DockerImageName getSocatDockerImageName() {
-        return getImage("socat.container.image", "alpine/socat:latest");
+        return getImage("socat.container.image", "alpine/socat:latest")
+            .asCanonicalNameString();
     }
 
     @Deprecated
     public String getVncRecordedContainerImage() {
-        return getVncDockerImageName().asCanonicalNameString();
-    }
-
-    public DockerImageName getVncDockerImageName() {
-        return getImage("vncrecorder.container.image", "testcontainers/vnc-recorder:1.1.0");
+        return getImage("vncrecorder.container.image", "testcontainers/vnc-recorder:1.1.0")
+            .asCanonicalNameString();
     }
 
     @Deprecated
     public String getDockerComposeContainerImage() {
-        return getDockerComposeDockerImageName().asCanonicalNameString();
-    }
-
-    public DockerImageName getDockerComposeDockerImageName() {
-        return getImage("compose.container.image", "docker/compose:1.24.1");
+        return getImage("compose.container.image", "docker/compose:1.24.1")
+            .asCanonicalNameString();
     }
 
     @Deprecated
     public String getTinyImage() {
-        return getTinyDockerImageName().asCanonicalNameString();
-    }
-
-    public DockerImageName getTinyDockerImageName() {
-        return getImage("tinyimage.container.image", "alpine:3.5");
+        return getImage("tinyimage.container.image", "alpine:3.5")
+            .asCanonicalNameString();
     }
 
     public boolean isRyukPrivileged() {
@@ -132,6 +116,24 @@ public class TestcontainersConfiguration {
 
     public Integer getRyukTimeout() {
         return Integer.parseInt((String) properties.getOrDefault("ryuk.container.timeout", "30"));
+    }
+
+    @Deprecated
+    public String getKafkaImage() {
+        return getImage("kafka.container.image", "confluentinc/cp-kafka")
+            .asCanonicalNameString();
+    }
+
+    @Deprecated
+    public String getPulsarImage() {
+        return getImage("pulsar.container.image", "apachepulsar/pulsar")
+            .asCanonicalNameString();
+    }
+
+    @Deprecated
+    public String getLocalStackImage() {
+        return getImage("localstack.container.image", "localstack/localstack")
+            .asCanonicalNameString();
     }
 
     public boolean isDisableChecks() {

@@ -230,6 +230,7 @@ public class TestcontainersConfiguration {
                     Optional.ofNullable(entry.getValue())
                         .map(properties::get)
                         .map(String::valueOf)
+                        .map(String::trim)
                         .map(DockerImageName::parse)
                         .orElse(original)
                         .asCompatibleSubstituteFor(original);

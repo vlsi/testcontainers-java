@@ -2,13 +2,16 @@ package org.testcontainers.utility;
 
 
 import com.google.common.net.HostAndPort;
+import java.util.regex.Pattern;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.With;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.regex.Pattern;
-
 @EqualsAndHashCode(exclude = { "rawName", "compatibleSubstituteFor" })
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DockerImageName {
 
     /* Regex patterns used for validation */
@@ -20,8 +23,9 @@ public final class DockerImageName {
     private final String rawName;
     private final String registry;
     private final String repo;
+    @Nullable @With(AccessLevel.PRIVATE)
     private final Versioning versioning;
-    @Nullable
+    @Nullable @With(AccessLevel.PRIVATE)
     private final DockerImageName compatibleSubstituteFor;
 
     /**
@@ -113,19 +117,6 @@ public final class DockerImageName {
         compatibleSubstituteFor = null;
     }
 
-    private DockerImageName(String rawName,
-                            String registry,
-                            String repo,
-                            @Nullable Versioning versioning,
-                            @Nullable DockerImageName compatibleSubstituteFor) {
-
-        this.rawName = rawName;
-        this.registry = registry;
-        this.repo = repo;
-        this.versioning = versioning;
-        this.compatibleSubstituteFor = compatibleSubstituteFor;
-    }
-
     /**
      * @return the unversioned (non 'tag') part of this name
      */
@@ -181,7 +172,7 @@ public final class DockerImageName {
      * @return an immutable copy of this {@link DockerImageName} with the new version tag
      */
     public DockerImageName withTag(final String newTag) {
-        return new DockerImageName(rawName, registry, repo, new Versioning.TagVersioning(newTag), compatibleSubstituteFor);
+        return withVersioning(new Versioning.TagVersioning(newTag));
     }
 
     /**
@@ -192,7 +183,7 @@ public final class DockerImageName {
      * @return an immutable copy of this {@link DockerImageName} with the compatibility declaration attached.
      */
     public DockerImageName asCompatibleSubstituteFor(String otherImageName) {
-        return asCompatibleSubstituteFor(DockerImageName.parse(otherImageName));
+        return withCompatibleSubstituteFor(DockerImageName.parse(otherImageName));
     }
 
     /**
@@ -203,7 +194,7 @@ public final class DockerImageName {
      * @return an immutable copy of this {@link DockerImageName} with the compatibility declaration attached.
      */
     public DockerImageName asCompatibleSubstituteFor(DockerImageName otherImageName) {
-        return new DockerImageName(rawName, registry, repo, versioning, otherImageName);
+        return withCompatibleSubstituteFor(otherImageName);
     }
 
     /**
@@ -237,25 +228,43 @@ public final class DockerImageName {
     }
 
     /**
-     * Behaves as {@link DockerImageName#isCompatibleWith(DockerImageName)} but throws an exception rather than
-     * returning false if a mismatch is detected.
+     * Behaves as {@link DockerImageName#isCompatibleWith(DockerImageName)} but throws an exception
+     * rather than returning false if a mismatch is detected.
      *
-     * @param other the other image that we are trying to check compatibility with
-     * @throws IllegalStateException if {@link DockerImageName#isCompatibleWith(DockerImageName)} returns false
+     * @param anyOthers the other image(s) that we are trying to check compatibility with. If more
+     *                  than one is provided, this method will check compatibility with at least one
+     *                  of them.
+     * @throws IllegalStateException if {@link DockerImageName#isCompatibleWith(DockerImageName)}
+     *                               returns false
      */
-    public void assertCompatibleWith(DockerImageName other) {
-        if (!this.isCompatibleWith(other)) {
-            throw new IllegalStateException(
-                String.format(
-                    "Failed to verify that image '%s' is a compatible substitute for '%s'. This generally means that " +
-                        "you are trying to use an image that Testcontainers has not been designed to use. If this is " +
-                        "deliberate, and if you are confident that the image is compatible, you should declare " +
-                        "compatibility in code using the `asCompatibleSubstituteFor` method. For example:\n" +
-                        "   DockerImageName myImage = DockerImageName.parse(\"%s\").asCompatibleSubstituteFor(\"%s\");\n" +
-                        "and then use `myImage` instead.",
-                    this.rawName, other.rawName, this.rawName, other.rawName
-                )
-            );
+    public void assertCompatibleWith(DockerImageName... anyOthers) {
+        if (anyOthers.length == 0) {
+            throw new IllegalArgumentException("anyOthers parameter must be non-empty");
         }
+
+        for (DockerImageName anyOther : anyOthers) {
+            if (this.isCompatibleWith(anyOther)) {
+                return;
+            }
+        }
+
+        final DockerImageName exampleOther = anyOthers[0];
+
+        throw new IllegalStateException(
+            String.format(
+                "Failed to verify that image '%s' is a compatible substitute for '%s'. This generally means that "
+                    +
+                    "you are trying to use an image that Testcontainers has not been designed to use. If this is "
+                    +
+                    "deliberate, and if you are confident that the image is compatible, you should declare "
+                    +
+                    "compatibility in code using the `asCompatibleSubstituteFor` method. For example:\n"
+                    +
+                    "   DockerImageName myImage = DockerImageName.parse(\"%s\").asCompatibleSubstituteFor(\"%s\");\n"
+                    +
+                    "and then use `myImage` instead.",
+                this.rawName, exampleOther.rawName, this.rawName, exampleOther.rawName
+            )
+        );
     }
 }

@@ -71,7 +71,7 @@ public class LocalStackContainer extends GenericContainer<LocalStackContainer> {
      */
     @Deprecated
     public LocalStackContainer(String version) {
-        this( DEFAULT_IMAGE_NAME.withTag(version));
+        this(DEFAULT_IMAGE_NAME.withTag(version));
     }
 
     /**

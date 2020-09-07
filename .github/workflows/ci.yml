@@ -18,22 +18,13 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '1.8'
-      - name: Cache Gradle Home files
-        uses: actions/cache@v1
+      - uses: burrunan/gradle-cache-action@v1
+        id: set-matrix
+        name: set-matrix
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-home-testmatrix-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-home-testmatrix-
-      - id: set-matrix
-        env:
-          # Since we override the tests executor,
-          # we should not push empty results to the cache
-          READ_ONLY_REMOTE_GRADLE_CACHE: true
-        run: |
-          TASKS=$(./gradlew --no-daemon --parallel -q testMatrix)
-          echo $TASKS
-          echo "::set-output name=matrix::{\"gradle_args\":$TASKS}"
+          job-id: testmatrix
+          multi-cache-enabled: true
+          arguments: --parallel -q testMatrix
   check:
     needs: find_gradle_jobs
     strategy:
@@ -45,19 +36,14 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '1.8'
-      - name: Cache Gradle Home files
-        uses: actions/cache@v2
-        continue-on-error: true
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-home-${{matrix.gradle_args}}_check-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-home-${{matrix.gradle_args}}_check-
       - name: Clear existing docker image cache
         run: docker image prune -af
-      - name: Build and test with Gradle (${{matrix.gradle_args}})
-        run: |
-          ./gradlew --no-daemon --continue --scan ${{matrix.gradle_args}}
+      - uses: burrunan/gradle-cache-action@v1
+        name: Build and test with Gradle (${{matrix.gradle_args}})
+        with:
+          job-id: ${{matrix.gradle_args}}
+          multi-cache-enabled: true
+          arguments: --continue --scan ${{matrix.gradle_args}}
       - name: Aggregate test reports with ciMate
         if: always()
         continue-on-error: true
@@ -72,11 +58,16 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - name: Build with Gradle
+      - name: Prepare .testcontainers.properties
         run: |
           echo "transport.type=httpclient5" > $HOME/.testcontainers.properties
           cat $HOME/.testcontainers.properties
-          ./gradlew --no-daemon --scan testcontainers:test --tests '*EventStreamTest'
+      - uses: burrunan/gradle-cache-action@v1
+        name: Build with Gradle
+        with:
+          job-id: ${{matrix.gradle_args}}
+          multi-cache-enabled: true
+          arguments: --scan testcontainers:test --tests '*EventStreamTest'
       - name: aggregate test reports with ciMate
         if: always()
         continue-on-error: true

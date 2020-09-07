@@ -15,7 +15,7 @@ task testMatrix {
                 .findAll { !it.state.upToDate }
                 .collect { it.path }
 
-            println(JsonOutput.toJson(checkTaskPaths))
+            println("::set-output name=matrix::{\"gradle_args\":${JsonOutput.toJson(checkTaskPaths)}}")
         }
     }
 }

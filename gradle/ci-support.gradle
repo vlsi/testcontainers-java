@@ -26,6 +26,7 @@ gradle.taskGraph.whenReady {
     if (it.hasTask(tasks.testMatrix)) {
         for (subproject in subprojects) {
             subproject.tasks.withType(Test).all {
+                outputs.cacheIf("test execution was skipped, so caching is disabled") { false }
                 testExecuter([execute: { spec, processor -> }, stopNow:{}] as org.gradle.api.internal.tasks.testing.TestExecuter)
             }
             subproject.tasks.findByName("shadowJar")?.enabled = false

@@ -2,14 +2,13 @@ package org.testcontainers.utility;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 
-@Testcontainers
+@ExtendWith(MockTestcontainersConfigurationExtension.class)
 public class DefaultImageNameSubstitutorTest {
 
     public static final DockerImageName ORIGINAL_IMAGE = DockerImageName.parse("foo");
@@ -17,9 +16,6 @@ public class DefaultImageNameSubstitutorTest {
     public static final DockerImageName SUBSTITUTE_IMAGE = DockerImageName.parse("bar");
 
     private ConfigurationFileImageNameSubstitutor underTest;
-
-    @Container
-    public MockTestcontainersConfigurationRule config = new MockTestcontainersConfigurationRule();
 
     @BeforeEach
     public void setUp() {

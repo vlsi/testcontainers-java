@@ -3,22 +3,18 @@ package org.testcontainers.images;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.testcontainers.DockerRegistryContainer;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.FakeImagePullPolicy;
-import org.testcontainers.utility.MockTestcontainersConfigurationRule;
+import org.testcontainers.utility.MockTestcontainersConfigurationExtension;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Testcontainers
+@ExtendWith(MockTestcontainersConfigurationExtension.class)
 public class OverrideImagePullPolicyTest {
-
-    @Container
-    public MockTestcontainersConfigurationRule config = new MockTestcontainersConfigurationRule();
 
     private ImagePullPolicy originalInstance;
 

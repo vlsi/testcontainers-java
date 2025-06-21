@@ -3,11 +3,10 @@ package org.testcontainers.utility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,14 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 
-@Testcontainers
+@ExtendWith(MockTestcontainersConfigurationExtension.class)
 public class ImageNameSubstitutorTest {
 
     @TempDir
     public Path tempFolder;
-
-    @Container
-    public MockTestcontainersConfigurationRule config = new MockTestcontainersConfigurationRule();
 
     private ImageNameSubstitutor originalInstance;
 

@@ -1,11 +1,10 @@
 package org.testcontainers;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.dockerclient.LogToStringContainerCallback;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.MockTestcontainersConfigurationRule;
+import org.testcontainers.utility.MockTestcontainersConfigurationExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,11 +12,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Test for {@link DockerClientFactory}.
  */
-@Testcontainers
+@ExtendWith(MockTestcontainersConfigurationExtension.class)
 public class DockerClientFactoryTest {
-
-    @Container
-    public MockTestcontainersConfigurationRule configurationMock = new MockTestcontainersConfigurationRule();
 
     @Test
     public void runCommandInsideDockerShouldNotFailIfImageDoesNotExistsLocally() {
